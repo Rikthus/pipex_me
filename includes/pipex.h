@@ -6,7 +6,7 @@
 /*   By: maxperei <maxperei@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 15:19:43 by maxperei          #+#    #+#             */
-/*   Updated: 2021/12/16 15:34:24 by maxperei         ###   ########lyon.fr   */
+/*   Updated: 2022/01/27 15:52:27 by maxperei         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,5 +21,10 @@
 # include <sys/types.h>
 # include <sys/uio.h>
 # include <sys/wait.h>
+
+//////   MAIN   ///////
+
+//////   UTILS   //////
+char	*path_join(char *s1, char *s2);
 
 #endif

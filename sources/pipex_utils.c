@@ -6,7 +6,7 @@
 /*   By: maxperei <maxperei@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/27 15:33:14 by maxperei          #+#    #+#             */
-/*   Updated: 2022/01/27 15:56:26 by maxperei         ###   ########lyon.fr   */
+/*   Updated: 2022/01/31 16:24:29 by maxperei         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,11 @@ char	*path_join(char *s1, char *s2)
 	}
 	path[i] = '\0';
 	return (path);
+}
+
+char	**split_cmd_args(char *fullcmd)
+{
+	
 }
 
 void	free_split(char **split)

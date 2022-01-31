@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: maxperei <maxperei@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/16 15:52:33 by maxperei          #+#    #+#             */
-/*   Updated: 2022/01/27 16:00:20 by maxperei         ###   ########lyon.fr   */
+/*   Created: 2022/01/31 11:28:04 by maxperei          #+#    #+#             */
+/*   Updated: 2022/01/31 16:43:04 by maxperei         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/pipex.h"
+#include "./includes/pipex.h"
 
-static	char	*check_access(char *cmd, char **env_path)
+static char *check_access(char *cmd, char **env_path) // TO CHECK + JUSTE ENVOYER LA CMD SANS ARG
 {
 	int		i;
 	int		valid_exec;
@@ -22,6 +22,8 @@ static	char	*check_access(char *cmd, char **env_path)
 	valid_exec = -1;
 	while (valid_exec == -1)
 	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
 		i++;
 		full_path = path_join(env_path[i], cmd);
 		valid_exec = access(full_path, X_OK);
@@ -34,7 +36,7 @@ static	char	*check_access(char *cmd, char **env_path)
 		return (NULL);
 }
 
-static	char	**find_paths(char **envp)
+static char **find_paths(char **envp) // TO CHECK
 {
 	char	*path;
 	char	**split_path;
@@ -43,62 +45,54 @@ static	char	**find_paths(char **envp)
 	i = 0;
 	while (envp[i])
 	{
-		if (ft_strncmp(envp[i], "PATH=", 5))
+		if (ft_strncmp(envp[i], "PATH=", 5) != 0)
 			i++;
 		else
 		{
 			path = envp[i];
-			break ;
+			break;
 		}
 	}
-	path += 4;
+	path += 5;
 	split_path = ft_split(path, ':');
 	return (split_path);
 }
 
-static	void	exec_cmd(char *cmd, char **paths)
+static	void	child_process(int fd, char *cmd, char **envp, char **paths)
 {
-	char	*exec_path;
-	pid_t	pid;
-	int		fd[2];
 
-	exec_path = check_access(cmd, paths);
-	if (!exec_path)
-		return ;
-	pipe(fd);
+}
+
+static	void	pipex(int *file, char **argv, char **envp, char **paths)
+{
+	char	**split_cmd;
+	pid_t	pid;
+
 	pid = fork();
+	if (pid = -1)
+		return ;
 	if (pid == 0)
+		child_process();
+	else
 	{
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		execve(exec_path, );
-		exit();
+
 	}
-	wait_pid(pid);
-	
+	perror("Parent execution error");
+	exit();
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	pid_t	pid;
-	int		fd[2];
+	int		file[2];
+	char	**paths;
 
-	pipe(fd);
-	pid = fork();
-	if (pid == 0)
-	{
-		//CHILD
-		dup2(fd[1],STDOUT_FILENO);
-		close(fd[0]);
-		access(join, X_OK);
-		execve();
-		exit();
-	}
-	waitpid(pid);
-	else
-	{
-		//PARENT
-	}
-
+	file[0] = open(argv[1], O_RDONLY);
+	file[1] = open(argv[4], O_CREAT | O_RDWR, 0777);
+	if (file[0] < 0 || file[1] < 0 || ft_strncmp(argv[1], "infile", 7) != 0)
+		return (-1);
+	paths = find_paths(envp);
+	pipex(file, argv, envp, paths);
+	// WHAT TO DO IF NOT ENOUGH ARGS ?
 	free_split(paths);
+	return (0);
 }

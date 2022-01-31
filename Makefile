@@ -1,33 +1,38 @@
-SRCS =	
+SRCS :=
 
-INCS = ./includes/pipex.h
+INCS := ./includes/pipex.h
 
-OBJS = $(SRCS:.c=.o)
+OBJS := $(SRCS:.c=.o)
 
-CC = clang
-CFLAGS = -Wall -Wextra -Werror -I $(INCS)
-LIBFT = ./libft/libft.a
-NAME = pipex
+CC := clang
 
-all : libft $(NAME)
+CFLAGS := -Wall -Wextra -Werror -I $(INCS)
 
-libft :
-		make -C ./libft
+LIBFT := ./libft
+
+MAKE := make
+
+NAME := pipex
+
+all : lib $(NAME)
+
+lib :
+		$(MAKE) -C $(LIBFT)
 
 %.o : %.c $(INCS)
 		$(CC) $(CFLAGS) -c $< -o $@
 
-$(NAME) : $(OBJS) $(LIBFT)
-		$(CC) $(OBJS) $(LIBFT) -o $(NAME)
+$(NAME) : $(OBJS)
+		$(CC) $(OBJS) -o $(NAME)
 
 clean :
-		make clean -C ./libft
+		$(MAKE) clean -C ./libft
 		rm -f $(OBJS)
 
 fclean : clean
-		make fclean -C ./libft
+		$(MAKE) fclean -C ./libft
 		rm -f $(NAME)
 
 re : fclean all
 
-.PHONY : all libft clean fclean re
+.PHONY : all lib clean fclean re

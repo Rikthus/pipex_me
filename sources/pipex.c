@@ -1,98 +1,89 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: maxperei <maxperei@student.42lyon.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/31 11:28:04 by maxperei          #+#    #+#             */
-/*   Updated: 2022/01/31 16:43:04 by maxperei         ###   ########lyon.fr   */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../includes/pipex.h"
 
-#include "./includes/pipex.h"
-
-static char *check_access(char *cmd, char **env_path) // TO CHECK + JUSTE ENVOYER LA CMD SANS ARG
-{
-	int		i;
-	int		valid_exec;
-	char	*full_path;
-
-	i = -1;
-	valid_exec = -1;
-	while (valid_exec == -1)
-	{
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
-		i++;
-		full_path = path_join(env_path[i], cmd);
-		valid_exec = access(full_path, X_OK);
-		if (valid_exec == -1 && full_path)
-			free(full_path);
-	}
-	if (valid_exec == 0)
-		return (full_path);
-	else
-		return (NULL);
-}
-
-static char **find_paths(char **envp) // TO CHECK
-{
-	char	*path;
-	char	**split_path;
-	int		i;
-
-	i = 0;
-	while (envp[i])
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) != 0)
-			i++;
-		else
-		{
-			path = envp[i];
-			break;
-		}
-	}
-	path += 5;
-	split_path = ft_split(path, ':');
-	return (split_path);
-}
-
-static	void	child_process(int fd, char *cmd, char **envp, char **paths)
-{
-
-}
-
-static	void	pipex(int *file, char **argv, char **envp, char **paths)
+void	exec_cmd(int cmd_index, char **argv, char **envp)
 {
 	char	**split_cmd;
-	pid_t	pid;
+	char	*path;
+	int		i;
 
-	pid = fork();
-	if (pid = -1)
-		return ;
-	if (pid == 0)
-		child_process();
+	split_cmd = ft_split(argv[cmd_index], ' ');
+	if (ft_strchr(split_cmd[0], 47))
+	{
+		if (access(split_cmd[0], X_OK) == 0)
+			execve(split_cmd[0], split_cmd, envp);
+	}
 	else
 	{
-
+		path = pathfinder(split_cmd[0], envp);
+		execve(path, split_cmd, envp);
+		free(path);
 	}
-	perror("Parent execution error");
-	exit();
+	free_split(split_cmd);
+	perror("command exec failed");
+	exit(1);
 }
+
+void	pipeline(int cmd_index, int argc, char **argv, char **envp)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+
+	if (pipe(pipe_fd) == -1)
+		return ;
+	while (cmd_index < argc - 1)
+	{
+		pid = fork();
+		if (pid == -1)
+			return ;
+		if (pid == 0)
+		{
+			if (cmd_index == 2)
+				first_process(cmd_index, pipe_fd, argv, envp);
+			else if (cmd_index == argc - 2)
+				last_process(cmd_index, pipe_fd, argv, envp);
+			else
+				inter_process(cmd_index, pipe_fd, argv, envp);
+			return ;
+		}
+		waitpid(pid)
+		cmd_index++;
+	}
+	while (wait(NULL) != -1);
+}
+
+// static	void	pipeline(char **argv, char **envp)
+// {
+// 	int		pipe_fd[2];
+// 	int		outfile;
+// 	int		status;
+// 	pid_t	pid;  //*pid
+
+// 	if (pipe(pipe_fd) == -1)
+// 		return ;
+// 	pid = fork();
+// 	if (pid == -1)
+// 		return ;
+// 	if (pid == 0)
+// 		child_process(2, pipe_fd, argv, envp);
+// 	else
+// 	{
+// 		waitpid(pid, &status, 0);
+// 		outfile = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, 0644);
+// 		if (outfile < 3)
+// 			return ;
+// 		if (dup2(outfile, STDOUT_FILENO) == -1)
+// 			return ;
+// 		close(pipe_fd[0]);
+// 		close(outfile);
+// 		exec_cmd(3, argv, envp);
+// 	}
+// }
 
 int	main(int argc, char **argv, char **envp)
 {
-	int		file[2];
-	char	**paths;
-
-	file[0] = open(argv[1], O_RDONLY);
-	file[1] = open(argv[4], O_CREAT | O_RDWR, 0777);
-	if (file[0] < 0 || file[1] < 0 || ft_strncmp(argv[1], "infile", 7) != 0)
-		return (-1);
-	paths = find_paths(envp);
-	pipex(file, argv, envp, paths);
-	// WHAT TO DO IF NOT ENOUGH ARGS ?
-	free_split(paths);
-	return (0);
+	int	cmd_index;
+	if (argc < 5 || ft_strncmp(argv[1], "infile", 7) != 0)
+		return(1);
+	cmd_index = 2;
+	pipeline(cmd_index, argc, argv, envp);
 }

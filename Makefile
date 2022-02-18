@@ -1,38 +1,44 @@
-SRCS :=
+NAME		:=		pipex
 
-INCS := ./includes/pipex.h
+CC			:=		gcc
+CFLAGS		:=		-Wall -Wextra -Werror
 
-OBJS := $(SRCS:.c=.o)
+DIR_SRCS	:=		sources
+DIR_OBJS	:=		.objects
+DIR_INCS	:=		includes
+DIR_LIBFT	:=		libft
 
-CC := clang
+LST_SRCS	:=		pipex.c		\
+					utils.c		
+LST_OBJS	:=		$(LST_SRCS:.c=.o)
+LST_INCS	:=		pipex.h
 
-CFLAGS := -Wall -Wextra -Werror -I $(INCS)
+SRCS		:=		$(addprefix $(DIR_SRCS)/,$(LST_SRCS))
+OBJS		:=		$(addprefix $(DIR_OBJS)/,$(LST_OBJS))
+INCS		:=		$(addprefix $(DIR_INCS)/,$(LST_INCS))
 
-LIBFT := ./libft
+AR_LIBFT	:=		$(DIR_LIBFT)/libft.a
 
-MAKE := make
+all		:	$(NAME)
 
-NAME := pipex
+$(NAME)	:	$(AR_LIBFT) $(LST_OBJS)
+			$(CC) $(CFLAGS) $^ -o $@
 
-all : lib $(NAME)
+$(DIR_OBJS)/%.o		:	$(DIR_SRCS)/%.c $(INCS) Makefile | $(DIR_OBJS)
+			$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 
-lib :
-		$(MAKE) -C $(LIBFT)
+$(AR_LIBFT)	:
+			$(MAKE) -C libft
 
-%.o : %.c $(INCS)
-		$(CC) $(CFLAGS) -c $< -o $@
+$(DIR_OBJS)	:
+			mkdir -p $(DIR_OBJS)
 
-$(NAME) : $(OBJS)
-		$(CC) $(OBJS) -o $(NAME)
+clean	:
+			rm -rf $(DIR_OBJS)
 
-clean :
-		$(MAKE) clean -C ./libft
-		rm -f $(OBJS)
+fclean	:	clean
+			rm -rf $(NAME)
 
-fclean : clean
-		$(MAKE) fclean -C ./libft
-		rm -f $(NAME)
+re		:	fclean all
 
-re : fclean all
-
-.PHONY : all lib clean fclean re
+.PHONY	:	all clean fclean re

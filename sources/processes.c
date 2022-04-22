@@ -20,7 +20,7 @@ void	last_process(int cmd_index, int *pipe_fd, char **argv, char **envp)
 {
 	int	outfile;
 
-	outfile = open(argv[1], O_CREAT | O_RDWR | O_TRUNC, 0644);
+	outfile = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (outfile < 3)
 		exit(4);
 	if (dup2(outfile, STDOUT_FILENO) == -1)

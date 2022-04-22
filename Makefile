@@ -9,7 +9,7 @@ DIR_INCS	:=		includes
 DIR_LIBFT	:=		libft
 
 LST_SRCS	:=		pipex.c		\
-					utils.c		
+					utils.c
 LST_OBJS	:=		$(LST_SRCS:.c=.o)
 LST_INCS	:=		pipex.h
 
@@ -21,7 +21,7 @@ AR_LIBFT	:=		$(DIR_LIBFT)/libft.a
 
 all		:	$(NAME)
 
-$(NAME)	:	$(AR_LIBFT) $(LST_OBJS)
+$(NAME)	:	$(AR_LIBFT) $(OBJS)
 			$(CC) $(CFLAGS) $^ -o $@
 
 $(DIR_OBJS)/%.o		:	$(DIR_SRCS)/%.c $(INCS) Makefile | $(DIR_OBJS)

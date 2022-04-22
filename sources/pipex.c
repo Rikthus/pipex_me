@@ -4,7 +4,6 @@ void	exec_cmd(int cmd_index, char **argv, char **envp)
 {
 	char	**split_cmd;
 	char	*path;
-	int		i;
 
 	split_cmd = ft_split(argv[cmd_index], ' ');
 	if (ft_strchr(split_cmd[0], 47))
@@ -45,7 +44,6 @@ void	pipeline(int cmd_index, int argc, char **argv, char **envp)
 				inter_process(cmd_index, pipe_fd, argv, envp);
 			return ;
 		}
-		waitpid(pid)
 		cmd_index++;
 	}
 	while (wait(NULL) != -1);
